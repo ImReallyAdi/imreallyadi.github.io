@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>imreallyadi Links</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #7b0f0f, #d4145a);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      animation: fadeIn 2s ease;
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .link {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1rem 2rem;
+      border-radius: 15px;
+      text-decoration: none;
+      color: white;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    .link:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .link i {
+      font-size: 1.5rem;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <h1>@imreallyadi</h1>
+  <div class="links">
+    <a href="https://www.youtube.com/@imreallyadi" class="link" target="_blank">
+      <i class="fab fa-youtube"></i> YouTube
+    </a>
+    <a href="https://drift.rip/go?ref=connection&p=36&url=https%3A%2F%2Fsnapchat.com%2Fadd%2Fimreallyadi" class="link" target="_blank">
+      <i class="fab fa-snapchat"></i> Snapchat
+    </a>
+    <a href="https://drift.rip/go?ref=connection&p=36&url=https%3A%2F%2Fdiscord.com%2Fusers%2F1165042827928019005" class="link" target="_blank">
+      <i class="fab fa-discord"></i> Discord
+    </a>
+    <a href="https://drift.rip/go?ref=connection&p=36&url=https%3A%2F%2Fwww.roblox.com%2Fusers%2F3507400125%2Fprofile" class="link" target="_blank">
+      <i class="fas fa-gamepad"></i> Roblox
+    </a>
+  </div>
+</body>
+</html>
