@@ -3,58 +3,141 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>imreallyadi Links</title>
+  <title>@imreallyadi — Links</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    body {
+    :root {
+      --glass-bg: rgba(255, 255, 255, 0.06);
+      --glass-hover: rgba(255, 255, 255, 0.15);
+      --border-color: rgba(255, 255, 255, 0.12);
+      --text-color: #ffffff;
+      --shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+      --font-main: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #7b0f0f, #d4145a);
-      color: white;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: #0a0a0a;
+      height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      flex-direction: column;
+      color: var(--text-color);
+      overflow: hidden;
+      padding: 1rem;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 30%, #111111, transparent 60%),
+                  radial-gradient(circle at 70% 70%, #222222, transparent 60%);
+      animation: moveBackground 20s linear infinite;
+      z-index: 0;
+      filter: blur(80px);
+    }
+
+    @keyframes moveBackground {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(-25%, -25%); }
+      100% { transform: translate(0, 0); }
     }
 
     h1 {
-      font-size: 3rem;
-      margin-bottom: 2rem;
-      animation: fadeIn 2s ease;
+      font-size: 2.8rem;
+      font-weight: 600;
+      margin-bottom: 2.5rem;
+      letter-spacing: -0.5px;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.95);
+      animation: fadeZoomIn 1s ease forwards;
+      z-index: 1;
     }
 
     .links {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1rem;
+      width: 100%;
+      max-width: 360px;
+      z-index: 1;
     }
 
-    .link {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 1rem 2rem;
-      border-radius: 15px;
-      text-decoration: none;
-      color: white;
-      font-size: 1.2rem;
+    .link, .drift-button {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      transition: transform 0.2s ease, background 0.3s ease;
-    }
-
-    .link:hover {
-      transform: scale(1.05);
-      background: rgba(255, 255, 255, 0.2);
+      justify-content: center;
+      padding: 1rem 1.5rem;
+      border-radius: 18px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideFadeIn 0.8s ease forwards;
+      transition: all 0.25s ease;
     }
 
     .link i {
-      font-size: 1.5rem;
+      margin-right: 0.7rem;
+      font-size: 1.3rem;
     }
 
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: translateY(-20px); }
-      100% { opacity: 1; transform: translateY(0); }
+    .link:hover, .drift-button:hover {
+      background: var(--glass-hover);
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .link:nth-child(1) { animation-delay: 0.3s; }
+    .link:nth-child(2) { animation-delay: 0.45s; }
+    .link:nth-child(3) { animation-delay: 0.6s; }
+    .link:nth-child(4) { animation-delay: 0.75s; }
+
+    .drift-button {
+      margin-top: 2rem;
+      animation-delay: 0.95s;
+    }
+
+    @keyframes fadeZoomIn {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes slideFadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 420px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+
+      .link, .drift-button {
+        font-size: 0.95rem;
+        padding: 0.85rem 1.2rem;
+      }
     }
   </style>
 </head>
@@ -72,6 +155,9 @@
     </a>
     <a href="https://drift.rip/go?ref=connection&p=36&url=https%3A%2F%2Fwww.roblox.com%2Fusers%2F3507400125%2Fprofile" class="link" target="_blank">
       <i class="fas fa-gamepad"></i> Roblox
+    </a>
+    <a href="https://drift.rip/imreallyadi" class="drift-button" target="_blank">
+      🚀 GO TO DRIFT.RIP
     </a>
   </div>
 </body>
