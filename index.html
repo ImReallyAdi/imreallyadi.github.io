@@ -1,9 +1,331 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta http-equiv="refresh" content="0; url=https://adi.jsx.pm">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>adi</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+         
+            --bg-color: #1a1b26;      /* The Window Background */
+            --term-bg: #1a1b26;       /* The Terminal Background */
+            --text-color: #c0caf5;    /* Foreground */
+            --dim-text: #565f89;      /* Comments/Dim */
+            --accent-color: #7aa2f7;  /* Blue */
+            --user-color: #f7768e;    /* Red/Pink */
+            --host-color: #9ece6a;    /* Green */
+            --path-color: #7dcfff;    /* Cyan */
+            --cursor-color: #c0caf5;
+            
+            --font-stack: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #101014; /* Darker outer background to make terminal pop */
+            color: var(--text-color);
+            font-family: var(--font-stack);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* --- Terminal Window (Clean, Sharp, No Glow) --- */
+        .terminal-window {
+            width: 90%;
+            max-width: 900px;
+            height: 80vh;
+            background-color: var(--term-bg);
+            /* Minimal border usually seen in tiling window managers */
+            border: 1px solid #24283b; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 15px; /* Kitty usually has a bit of padding */
+            opacity: 0; 
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* --- Terminal Content --- */
+        .terminal-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            font-size: 0.95rem; /* Kitty defaults are usually crisp and slightly smaller */
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* Clean Scrollbar */
+        .terminal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .terminal-content::-webkit-scrollbar-thumb {
+            background: #414868;
+            border-radius: 3px;
+        }
+        .terminal-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .boot-log {
+            color: var(--dim-text);
+            margin-bottom: 2px;
+        }
+
+        .success { color: var(--host-color); }
+        .warning { color: #e0af68; }
+
+        .hero-section {
+            display: none; 
+            margin: 30px 0;
+            padding: 10px 0;
+        }
+
+        /* Clean, modern header */
+        .hero-name {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        .hero-role {
+            font-size: 1.1rem;
+            color: var(--host-color);
+            margin-bottom: 15px;
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: var(--dim-text);
+            font-style: italic;
+        }
+
+        /* --- Input Area --- */
+        .input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        /* ZSH / Powerlevel10k style prompt */
+        .prompt-arrow { margin: 0 8px 0 4px; font-weight: bold; }
+        .p-user { color: var(--user-color); font-weight: bold; }
+        .p-host { color: var(--host-color); font-weight: bold; }
+        .p-loc { color: var(--path-color); font-weight: bold; }
+
+        .user-input {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: var(--font-stack);
+            font-size: 0.95rem;
+            flex-grow: 1;
+            outline: none;
+            font-weight: 500;
+            caret-color: var(--cursor-color); /* Block cursor color */
+        }
+
+        .command-output {
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            color: #c0caf5;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .hero-name { font-size: 2rem; }
+            .terminal-window { width: 98%; height: 95vh; padding: 10px;}
+        }
+    </style>
 </head>
 <body>
-  <p>If you are not redirected, <a href="https://imreallyadi.jsx.pm">click here</a>.</p>
+
+    <div class="terminal-window">
+        <div class="terminal-content" id="output">
+            <div id="boot-sequence"></div>
+            
+            <div class="hero-section" id="hero">
+                <div class="hero-name">Adi</div>
+                <div class="hero-role">~/developer/designer</div>
+                <div class="hero-desc">Professional Dumbass and Professional Copy Paster ✌️</div>
+            </div>
+
+            <div id="history"></div>
+
+            <div class="input-line" id="input-area" style="display:none;">
+                <span class="p-user">visitor</span><span style="color:var(--dim-text)">@</span><span class="p-host">adi</span>
+                <span class="p-loc"> ~ </span>
+                <span class="prompt-arrow" style="color:var(--accent-color)">❯</span>
+                <input type="text" class="user-input" id="command-input" autocomplete="off" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bootSequenceDiv = document.getElementById('boot-sequence');
+        const heroDiv = document.getElementById('hero');
+        const inputArea = document.getElementById('input-area');
+        const inputField = document.getElementById('command-input');
+        const historyDiv = document.getElementById('history');
+        const terminalContent = document.getElementById('output');
+
+        // More technical/modern boot logs
+        const bootLogs = [
+            { text: "loading config from ~/.config/kitty/kitty.conf...", type: "normal" },
+            { text: "initializing gpu_renderer...", type: "normal" },
+            { text: "loading modules: [react, node, design_systems]", type: "normal" },
+            { text: "starting shell environment...", type: "normal" },
+            { text: "connection established.", type: "success" }
+        ];
+
+        // --- Typing Animation Function ---
+        function typeText(element, text, speed = 10) {
+            return new Promise(resolve => {
+                let i = 0;
+                function type() {
+                    if (i < text.length) {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                        terminalContent.scrollTop = terminalContent.scrollHeight;
+                        setTimeout(type, speed);
+                    } else {
+                        resolve();
+                    }
+                }
+                type();
+            });
+        }
+
+        // --- Boot Sequence Controller ---
+        async function runBootSequence() {
+            // Faster start than the CRT version
+            await new Promise(r => setTimeout(r, 500));
+
+            for (const log of bootLogs) {
+                const p = document.createElement('div');
+                p.className = 'boot-log';
+                
+                let content = `<span style="color:#565f89">::</span> ${log.text}`;
+                if(log.type === 'success') content += ` <span class="success">[OK]</span>`;
+                
+                p.innerHTML = content;
+                bootSequenceDiv.appendChild(p);
+                
+                await new Promise(r => setTimeout(r, 100)); // Fast log scrolling
+                terminalContent.scrollTop = terminalContent.scrollHeight;
+            }
+
+            await new Promise(r => setTimeout(r, 400));
+            initInterface();
+        }
+
+        function initInterface() {
+            bootSequenceDiv.style.display = 'none'; 
+            heroDiv.style.display = 'block'; 
+            inputArea.style.display = 'flex'; 
+            inputField.focus();
+            
+            const welcomeMsg = document.createElement('div');
+            welcomeMsg.className = 'command-output';
+            welcomeMsg.style.color = '#7aa2f7';
+            welcomeMsg.style.marginBottom = '20px';
+            historyDiv.appendChild(welcomeMsg);
+            typeText(welcomeMsg, "Type 'help' to view available commands.", 15);
+        }
+
+        // Start Boot
+        runBootSequence();
+
+        // --- Command Logic ---
+        inputField.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const command = inputField.value.trim().toLowerCase();
+                if (command) {
+                    processCommand(command);
+                }
+                inputField.value = '';
+            }
+        });
+
+        document.addEventListener('click', () => {
+            inputField.focus();
+        });
+
+        function processCommand(cmd) {
+            // Recreate the prompt in the history
+            const commandBlock = document.createElement('div');
+            commandBlock.innerHTML = `
+                <span class="p-user">visitor</span><span style="color:#565f89">@</span><span class="p-host">adi</span><span class="p-loc"> ~ </span><span class="prompt-arrow" style="color:#7aa2f7">❯</span> ${cmd}
+            `;
+            historyDiv.appendChild(commandBlock);
+
+            let response = "";
+
+            switch (cmd) {
+                case 'help':
+                    response = `
+<span style="color:#7aa2f7">Available Commands:</span>
+  <span style="color:#e0af68">about</span>     ::  Information about the adi
+  <span style="color:#e0af68">projects</span>  ::  List of deployed repositories
+  <span style="color:#e0af68">contact</span>   ::  Communication channels
+  <span style="color:#e0af68">clear</span>     ::  Clear terminal
+  <span style="color:#e0af68">neofetch</span>  ::  Display system specs`;
+                    break;
+                case 'about':
+                    response = "Professional Dumbass who can code and design. 😝";
+                    break;
+                case 'projects':
+                    response = `
+1. <span style="color:#7dcfff">edy</span> - Just a .md editor type shit 😭`;
+                    break;
+                case 'contact':
+                    response = "GitHub: @imreallyadi\nEmail: adi.redflag@gmail.com\nX: @imreallyadi\nLinks: drift.rip/imreallyadi";
+                    break;
+                case 'sudo':
+                    response = "<span style='color:#f7768e'>Error: User is not in the sudoers file. This incident will be reported.</span>";
+                    break;
+                case 'neofetch':
+                    response = `
+<span style="color:#7aa2f7">       /\\ </span>      <span style="color:#7aa2f7">Adi@Portfolio</span>
+<span style="color:#7aa2f7">      /  \\</span>      -------------
+<span style="color:#7aa2f7">     /\\   \\</span>     <span style="color:#e0af68">OS</span>: Arch
+<span style="color:#7aa2f7">    /      \\</span>    <span style="color:#e0af68">Host</span>: Browser
+<span style="color:#7aa2f7">   /   ,,   \\</span>   <span style="color:#e0af68">Uptime</span>: Forever
+<span style="color:#7aa2f7">  /   |  |   \\</span>  <span style="color:#e0af68">Shell</span>: ZSH
+<span style="color:#7aa2f7"> /_-''    ''-_\\</span> <span style="color:#e0af68">Theme</span>: Tokyo Night
+`;
+                    break;
+                case 'clear':
+                    historyDiv.innerHTML = "";
+                    return;
+                default:
+                    response = `<span style="color:#f7768e">command not found: ${cmd}</span>`;
+            }
+
+            const output = document.createElement('div');
+            output.className = 'command-output';
+            output.innerHTML = response; // InnerHTML to support colors in response
+            historyDiv.appendChild(output);
+            
+            terminalContent.scrollTop = terminalContent.scrollHeight;
+        }
+    </script>
 </body>
 </html>
