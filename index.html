@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-         
             --bg-color: #1a1b26;      /* The Window Background */
             --term-bg: #1a1b26;       /* The Terminal Background */
             --text-color: #c0caf5;    /* Foreground */
@@ -28,7 +27,8 @@
         }
 
         body {
-            background-color: #101014; /* Darker outer background to make terminal pop */
+            background-color: #101014;
+            background-image: radial-gradient(circle at center, #1f2335 0%, #101014 100%); /* Subtle radial depth */
             color: var(--text-color);
             font-family: var(--font-stack);
             height: 100vh;
@@ -38,40 +38,73 @@
             overflow: hidden;
         }
 
-        /* --- Terminal Window (Clean, Sharp, No Glow) --- */
+        /* --- CRT Scanline & Flicker Overlay --- */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.02) 50%,
+                rgba(0,0,0,0.02)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 999;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            100% { opacity: 1; }
+        }
+
+        /* --- Terminal Window --- */
         .terminal-window {
             width: 90%;
             max-width: 900px;
             height: 80vh;
-            background-color: var(--term-bg);
-            /* Minimal border usually seen in tiling window managers */
-            border: 1px solid #24283b; 
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            border-radius: 6px;
+            background-color: rgba(26, 27, 38, 0.95); /* Slight transparency */
+            border: 1px solid #292e42; 
+            box-shadow: 
+                0 0 20px rgba(122, 162, 247, 0.05), /* Subtle blue glow */
+                0 20px 50px rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             position: relative;
-            padding: 15px; /* Kitty usually has a bit of padding */
+            padding: 20px;
             opacity: 0; 
-            animation: fadeIn 0.5s ease-out forwards;
+            transform: scale(0.98);
+            animation: bootUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes bootUp {
+            to { opacity: 1; transform: scale(1); }
         }
 
         /* --- Terminal Content --- */
         .terminal-content {
             flex-grow: 1;
             overflow-y: auto;
-            font-size: 0.95rem; /* Kitty defaults are usually crisp and slightly smaller */
+            font-size: 0.95rem;
             line-height: 1.6;
             font-weight: 500;
+            padding-right: 5px;
         }
 
         /* Clean Scrollbar */
         .terminal-content::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         .terminal-content::-webkit-scrollbar-thumb {
             background: #414868;
-            border-radius: 3px;
+            border-radius: 2px;
         }
         .terminal-content::-webkit-scrollbar-track {
             background: transparent;
@@ -80,24 +113,34 @@
         .boot-log {
             color: var(--dim-text);
             margin-bottom: 2px;
+            font-size: 0.9rem;
         }
 
-        .success { color: var(--host-color); }
+        .success { color: var(--host-color); text-shadow: 0 0 5px rgba(158, 206, 106, 0.4); }
         .warning { color: #e0af68; }
 
         .hero-section {
             display: none; 
-            margin: 30px 0;
-            padding: 10px 0;
+            margin: 40px 0;
+            padding: 20px 0;
+            border-top: 1px dashed #292e42;
+            border-bottom: 1px dashed #292e42;
         }
 
         /* Clean, modern header */
         .hero-name {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 700;
             color: var(--accent-color);
             margin-bottom: 5px;
             letter-spacing: -1px;
+            text-shadow: 0 0 15px rgba(122, 162, 247, 0.5); /* Neon Glow */
+            animation: glowPulse 3s infinite alternate;
+        }
+
+        @keyframes glowPulse {
+            from { text-shadow: 0 0 10px rgba(122, 162, 247, 0.4); }
+            to { text-shadow: 0 0 20px rgba(122, 162, 247, 0.7); }
         }
 
         .hero-role {
@@ -116,10 +159,9 @@
         .input-line {
             display: flex;
             align-items: center;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
-        /* ZSH / Powerlevel10k style prompt */
         .prompt-arrow { margin: 0 8px 0 4px; font-weight: bold; }
         .p-user { color: var(--user-color); font-weight: bold; }
         .p-host { color: var(--host-color); font-weight: bold; }
@@ -134,30 +176,30 @@
             flex-grow: 1;
             outline: none;
             font-weight: 500;
-            caret-color: var(--cursor-color); /* Block cursor color */
+            caret-color: var(--accent-color); /* Matches theme */
         }
 
         .command-output {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             white-space: pre-wrap;
             color: #c0caf5;
+            animation: fadeIn 0.3s ease-out;
         }
 
-        /* --- Animations --- */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 600px) {
-            .hero-name { font-size: 2rem; }
-            .terminal-window { width: 98%; height: 95vh; padding: 10px;}
+            .hero-name { font-size: 2.2rem; }
+            .terminal-window { width: 98%; height: 95vh; padding: 15px;}
         }
     </style>
 </head>
 <body>
 
-    <div class="terminal-window">
+    <div class="scanlines"></div> <div class="terminal-window">
         <div class="terminal-content" id="output">
             <div id="boot-sequence"></div>
             
@@ -186,7 +228,6 @@
         const historyDiv = document.getElementById('history');
         const terminalContent = document.getElementById('output');
 
-        // More technical/modern boot logs
         const bootLogs = [
             { text: "loading config from ~/.config/kitty/kitty.conf...", type: "normal" },
             { text: "initializing gpu_renderer...", type: "normal" },
@@ -215,7 +256,6 @@
 
         // --- Boot Sequence Controller ---
         async function runBootSequence() {
-            // Faster start than the CRT version
             await new Promise(r => setTimeout(r, 500));
 
             for (const log of bootLogs) {
@@ -223,12 +263,17 @@
                 p.className = 'boot-log';
                 
                 let content = `<span style="color:#565f89">::</span> ${log.text}`;
-                if(log.type === 'success') content += ` <span class="success">[OK]</span>`;
                 
+                // Add the div to DOM first to animate it
                 p.innerHTML = content;
                 bootSequenceDiv.appendChild(p);
                 
-                await new Promise(r => setTimeout(r, 100)); // Fast log scrolling
+                if(log.type === 'success') {
+                    await new Promise(r => setTimeout(r, 150));
+                    p.innerHTML += ` <span class="success">[OK]</span>`;
+                }
+                
+                await new Promise(r => setTimeout(r, 80)); // Slightly faster logs
                 terminalContent.scrollTop = terminalContent.scrollHeight;
             }
 
@@ -239,6 +284,10 @@
         function initInterface() {
             bootSequenceDiv.style.display = 'none'; 
             heroDiv.style.display = 'block'; 
+            
+            // Trigger animation for hero section manually if needed, 
+            // but CSS animation handles the glow.
+            
             inputArea.style.display = 'flex'; 
             inputField.focus();
             
@@ -247,7 +296,7 @@
             welcomeMsg.style.color = '#7aa2f7';
             welcomeMsg.style.marginBottom = '20px';
             historyDiv.appendChild(welcomeMsg);
-            typeText(welcomeMsg, "Type 'help' to view available commands.", 15);
+            typeText(welcomeMsg, "Type 'help' to view available commands.", 20);
         }
 
         // Start Boot
@@ -269,8 +318,8 @@
         });
 
         function processCommand(cmd) {
-            // Recreate the prompt in the history
             const commandBlock = document.createElement('div');
+            commandBlock.className = 'command-output'; // Reusing class for spacing
             commandBlock.innerHTML = `
                 <span class="p-user">visitor</span><span style="color:#565f89">@</span><span class="p-host">adi</span><span class="p-loc"> ~ </span><span class="prompt-arrow" style="color:#7aa2f7">❯</span> ${cmd}
             `;
@@ -321,7 +370,7 @@
 
             const output = document.createElement('div');
             output.className = 'command-output';
-            output.innerHTML = response; // InnerHTML to support colors in response
+            output.innerHTML = response; 
             historyDiv.appendChild(output);
             
             terminalContent.scrollTop = terminalContent.scrollHeight;
