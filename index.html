@@ -4,20 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>adi</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #1a1b26;      /* The Window Background */
-            --term-bg: #1a1b26;       /* The Terminal Background */
-            --text-color: #c0caf5;    /* Foreground */
-            --dim-text: #565f89;      /* Comments/Dim */
-            --accent-color: #7aa2f7;  /* Blue */
-            --user-color: #f7768e;    /* Red/Pink */
-            --host-color: #9ece6a;    /* Green */
-            --path-color: #7dcfff;    /* Cyan */
-            --cursor-color: #c0caf5;
-            
-            --font-stack: 'JetBrains Mono', 'Fira Code', monospace;
+            --bg: #0f1115;
+            --term-bg: rgba(20, 22, 30, 0.75);
+            --text: #d7e1f8;
+            --dim: #6b7285;
+            --accent: #7aa2f7;
+            --user: #f7768e;
+            --host: #9ece6a;
+            --path: #7dcfff;
+            --cursor: #c0caf5;
+
+            --font: 'JetBrains Mono', monospace;
         }
 
         * {
@@ -27,354 +28,371 @@
         }
 
         body {
-            background-color: #101014;
-            background-image: radial-gradient(circle at center, #1f2335 0%, #101014 100%); /* Subtle radial depth */
-            color: var(--text-color);
-            font-family: var(--font-stack);
+            background: var(--bg);
+            background-image: radial-gradient(circle at top, #1b1e2b 0%, #0f1115 80%);
+            font-family: var(--font);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: var(--text);
             overflow: hidden;
         }
 
-        /* --- CRT Scanline & Flicker Overlay --- */
+        /* Slight scanline overlay, modern & subtle */
         .scanlines {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0),
-                rgba(255,255,255,0) 50%,
-                rgba(0,0,0,0.02) 50%,
-                rgba(0,0,0,0.02)
-            );
-            background-size: 100% 4px;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             pointer-events: none;
-            z-index: 999;
-            animation: flicker 0.15s infinite;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(255,255,255,0) 0px,
+                rgba(255,255,255,0) 2px,
+                rgba(0,0,0,0.03) 3px
+            );
+            opacity: 0.25;
         }
 
-        @keyframes flicker {
-            0% { opacity: 0.97; }
-            100% { opacity: 1; }
-        }
-
-        /* --- Terminal Window --- */
+        /* --- Modern Terminal Window --- */
         .terminal-window {
             width: 90%;
             max-width: 900px;
             height: 80vh;
-            background-color: rgba(26, 27, 38, 0.95); /* Slight transparency */
-            border: 1px solid #292e42; 
-            box-shadow: 
-                0 0 20px rgba(122, 162, 247, 0.05), /* Subtle blue glow */
-                0 20px 50px rgba(0, 0, 0, 0.6);
-            border-radius: 8px;
+            background: var(--term-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+
+            box-shadow:
+                0 0 30px rgba(0,0,0,0.5),
+                0 8px 25px rgba(0,0,0,0.35);
+
+            backdrop-filter: blur(14px);
             display: flex;
             flex-direction: column;
-            position: relative;
-            padding: 20px;
-            opacity: 0; 
-            transform: scale(0.98);
-            animation: bootUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-            backdrop-filter: blur(5px);
+            padding: 22px;
+
+            opacity: 0;
+            transform: translateY(8px);
+            animation: fadeRise 0.4s ease-out forwards;
         }
 
-        @keyframes bootUp {
-            to { opacity: 1; transform: scale(1); }
+        @keyframes fadeRise {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        /* --- Terminal Content --- */
         .terminal-content {
             flex-grow: 1;
             overflow-y: auto;
+            padding-right: 6px;
             font-size: 0.95rem;
             line-height: 1.6;
-            font-weight: 500;
-            padding-right: 5px;
+            letter-spacing: -0.2px;
         }
 
         /* Clean Scrollbar */
         .terminal-content::-webkit-scrollbar {
-            width: 4px;
+            width: 6px;
         }
         .terminal-content::-webkit-scrollbar-thumb {
-            background: #414868;
-            border-radius: 2px;
-        }
-        .terminal-content::-webkit-scrollbar-track {
-            background: transparent;
+            background: rgba(255,255,255,0.12);
+            border-radius: 6px;
         }
 
+        /* Boot logs */
         .boot-log {
-            color: var(--dim-text);
-            margin-bottom: 2px;
-            font-size: 0.9rem;
+            color: var(--dim);
+            font-size: 0.88rem;
+            margin-bottom: 4px;
         }
 
-        .success { color: var(--host-color); text-shadow: 0 0 5px rgba(158, 206, 106, 0.4); }
-        .warning { color: #e0af68; }
+        .success { color: var(--host); }
 
+        /* Hero Section (modern spacing) */
         .hero-section {
-            display: none; 
-            margin: 40px 0;
-            padding: 20px 0;
-            border-top: 1px dashed #292e42;
-            border-bottom: 1px dashed #292e42;
+            display: none;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 28px 0;
+            margin: 34px 0;
+            animation: fade 0.45s ease-out forwards;
         }
 
-        /* Clean, modern header */
-        .hero-name {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-bottom: 5px;
-            letter-spacing: -1px;
-            text-shadow: 0 0 15px rgba(122, 162, 247, 0.5); /* Neon Glow */
-            animation: glowPulse 3s infinite alternate;
-        }
-
-        @keyframes glowPulse {
-            from { text-shadow: 0 0 10px rgba(122, 162, 247, 0.4); }
-            to { text-shadow: 0 0 20px rgba(122, 162, 247, 0.7); }
-        }
-
-        .hero-role {
-            font-size: 1.1rem;
-            color: var(--host-color);
-            margin-bottom: 15px;
-        }
-
-        .hero-desc {
-            font-size: 1rem;
-            color: var(--dim-text);
-            font-style: italic;
-        }
-
-        /* --- Input Area --- */
-        .input-line {
-            display: flex;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        .prompt-arrow { margin: 0 8px 0 4px; font-weight: bold; }
-        .p-user { color: var(--user-color); font-weight: bold; }
-        .p-host { color: var(--host-color); font-weight: bold; }
-        .p-loc { color: var(--path-color); font-weight: bold; }
-
-        .user-input {
-            background: transparent;
-            border: none;
-            color: var(--text-color);
-            font-family: var(--font-stack);
-            font-size: 0.95rem;
-            flex-grow: 1;
-            outline: none;
-            font-weight: 500;
-            caret-color: var(--accent-color); /* Matches theme */
-        }
-
-        .command-output {
-            margin-bottom: 12px;
-            white-space: pre-wrap;
-            color: #c0caf5;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @media (max-width: 600px) {
-            .hero-name { font-size: 2.2rem; }
-            .terminal-window { width: 98%; height: 95vh; padding: 15px;}
+        .hero-name {
+            font-size: 2.7rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 6px;
+            letter-spacing: -1px;
+        }
+
+        .hero-role {
+            color: var(--host);
+            margin-bottom: 10px;
+        }
+
+        .hero-desc {
+            font-size: 0.95rem;
+            color: var(--dim);
+            font-style: italic;
+        }
+
+        /* Input */
+        .input-line {
+            display: flex;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .prompt-arrow {
+            margin: 0 8px;
+            color: var(--accent);
+        }
+
+        .p-user { color: var(--user); font-weight: 700; }
+        .p-host { color: var(--host); font-weight: 700; }
+        .p-loc { color: var(--path); font-weight: 700; }
+
+        .user-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        /* Blinking Cursor */
+        .user-input::after {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background: var(--cursor);
+            margin-left: 2px;
+            animation: blink 0.9s steps(1) infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .command-output {
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            animation: fadeCmd 0.25s ease-out;
+        }
+
+        @keyframes fadeCmd {
+            from { opacity: 0; transform: translateY(3px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
+
 <body>
 
-    <div class="scanlines"></div> <div class="terminal-window">
-        <div class="terminal-content" id="output">
-            <div id="boot-sequence"></div>
-            
-            <div class="hero-section" id="hero">
-                <div class="hero-name">Adi</div>
-                <div class="hero-role">~/developer/designer</div>
-                <div class="hero-desc">Professional Dumbass and Professional Copy Paster ✌️</div>
-            </div>
+<div class="scanlines"></div>
 
-            <div id="history"></div>
+<div class="terminal-window">
+    <div class="terminal-content" id="output">
 
-            <div class="input-line" id="input-area" style="display:none;">
-                <span class="p-user">visitor</span><span style="color:var(--dim-text)">@</span><span class="p-host">adi</span>
-                <span class="p-loc"> ~ </span>
-                <span class="prompt-arrow" style="color:var(--accent-color)">❯</span>
-                <input type="text" class="user-input" id="command-input" autocomplete="off" autofocus>
-            </div>
+        <div id="boot-sequence"></div>
+
+        <div class="hero-section" id="hero">
+            <div class="hero-name">Adi</div>
+            <div class="hero-role">~/developer/designer</div>
+            <div class="hero-desc">Professional Dumbass and Professional Copy Paster ✌️</div>
         </div>
+
+        <div id="history"></div>
+
+        <div class="input-line" id="input-area" style="display:none;">
+            <span class="p-user">visitor</span>
+            <span style="color:var(--dim)">@</span>
+            <span class="p-host">adi</span>
+            <span class="p-loc"> ~ </span>
+            <span class="prompt-arrow">❯</span>
+            <input type="text" class="user-input" id="command-input" autocomplete="off" autofocus>
+        </div>
+
     </div>
+</div>
 
-    <script>
-        const bootSequenceDiv = document.getElementById('boot-sequence');
-        const heroDiv = document.getElementById('hero');
-        const inputArea = document.getElementById('input-area');
-        const inputField = document.getElementById('command-input');
-        const historyDiv = document.getElementById('history');
-        const terminalContent = document.getElementById('output');
+<script>
+    const bootSequenceDiv = document.getElementById('boot-sequence');
+    const heroDiv = document.getElementById('hero');
+    const inputArea = document.getElementById('input-area');
+    const inputField = document.getElementById('command-input');
+    const historyDiv = document.getElementById('history');
+    const terminalContent = document.getElementById('output');
 
-        const bootLogs = [
-            { text: "loading config from ~/.config/kitty/kitty.conf...", type: "normal" },
-            { text: "initializing gpu_renderer...", type: "normal" },
-            { text: "loading modules: [react, node, design_systems]", type: "normal" },
-            { text: "starting shell environment...", type: "normal" },
-            { text: "connection established.", type: "success" }
-        ];
+    const bootLogs = [
+        { text: "loading config from ~/.config/kitty/kitty.conf...", type: "normal" },
+        { text: "initializing gpu_renderer...", type: "normal" },
+        { text: "loading modules: [react, node, design_systems]", type: "normal" },
+        { text: "starting shell environment...", type: "normal" },
+        { text: "connection established.", type: "success" }
+    ];
 
-        // --- Typing Animation Function ---
-        function typeText(element, text, speed = 10) {
-            return new Promise(resolve => {
-                let i = 0;
-                function type() {
-                    if (i < text.length) {
-                        element.innerHTML += text.charAt(i);
-                        i++;
-                        terminalContent.scrollTop = terminalContent.scrollHeight;
-                        setTimeout(type, speed);
-                    } else {
-                        resolve();
-                    }
-                }
-                type();
-            });
-        }
+    function typeText(el, text, speed = 12) {
+        return new Promise(resolve => {
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    el.innerHTML += text.charAt(i++);
+                    terminalContent.scrollTop = terminalContent.scrollHeight;
+                    setTimeout(type, speed);
+                } else resolve();
+            }
+            type();
+        });
+    }
 
-        // --- Boot Sequence Controller ---
-        async function runBootSequence() {
-            await new Promise(r => setTimeout(r, 500));
+    async function runBootSequence() {
+        await new Promise(r => setTimeout(r, 350));
 
-            for (const log of bootLogs) {
-                const p = document.createElement('div');
-                p.className = 'boot-log';
-                
-                let content = `<span style="color:#565f89">::</span> ${log.text}`;
-                
-                // Add the div to DOM first to animate it
-                p.innerHTML = content;
-                bootSequenceDiv.appendChild(p);
-                
-                if(log.type === 'success') {
-                    await new Promise(r => setTimeout(r, 150));
-                    p.innerHTML += ` <span class="success">[OK]</span>`;
-                }
-                
-                await new Promise(r => setTimeout(r, 80)); // Slightly faster logs
-                terminalContent.scrollTop = terminalContent.scrollHeight;
+        for (const log of bootLogs) {
+            const p = document.createElement('div');
+            p.className = "boot-log";
+            p.innerHTML = `:: ${log.text}`;
+            bootSequenceDiv.appendChild(p);
+
+            if (log.type === "success") {
+                await new Promise(r => setTimeout(r, 130));
+                p.innerHTML += ` <span class="success">[OK]</span>`;
             }
 
-            await new Promise(r => setTimeout(r, 400));
-            initInterface();
+            await new Promise(r => setTimeout(r, 70));
+            terminalContent.scrollTop = terminalContent.scrollHeight;
         }
 
-        function initInterface() {
-            bootSequenceDiv.style.display = 'none'; 
-            heroDiv.style.display = 'block'; 
-            
-            // Trigger animation for hero section manually if needed, 
-            // but CSS animation handles the glow.
-            
-            inputArea.style.display = 'flex'; 
-            inputField.focus();
-            
-            const welcomeMsg = document.createElement('div');
-            welcomeMsg.className = 'command-output';
-            welcomeMsg.style.color = '#7aa2f7';
-            welcomeMsg.style.marginBottom = '20px';
-            historyDiv.appendChild(welcomeMsg);
-            typeText(welcomeMsg, "Type 'help' to view available commands.", 20);
-        }
+        await new Promise(r => setTimeout(r, 350));
+        initInterface();
+    }
 
-        // Start Boot
-        runBootSequence();
+    function initInterface() {
+        bootSequenceDiv.style.display = "none";
+        heroDiv.style.display = "block";
+        inputArea.style.display = "flex";
 
-        // --- Command Logic ---
-        inputField.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const command = inputField.value.trim().toLowerCase();
-                if (command) {
-                    processCommand(command);
-                }
-                inputField.value = '';
+        inputField.focus();
+
+        const welcomeMsg = document.createElement('div');
+        welcomeMsg.className = "command-output";
+        welcomeMsg.style.color = "var(--accent)";
+        historyDiv.appendChild(welcomeMsg);
+
+        typeText(welcomeMsg, "Type 'help' to view available commands.", 20);
+    }
+
+    runBootSequence();
+
+    const history = [];
+    let historyIndex = -1;
+
+    inputField.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+            const cmd = inputField.value.trim().toLowerCase();
+            if (cmd) {
+                history.push(cmd);
+                historyIndex = history.length;
+                process(cmd);
             }
-        });
+            inputField.value = "";
+        }
 
-        document.addEventListener('click', () => {
-            inputField.focus();
-        });
+        if (e.key === "ArrowUp") {
+            if (historyIndex > 0) {
+                historyIndex--;
+                inputField.value = history[historyIndex];
+            }
+        }
 
-        function processCommand(cmd) {
-            const commandBlock = document.createElement('div');
-            commandBlock.className = 'command-output'; // Reusing class for spacing
-            commandBlock.innerHTML = `
-                <span class="p-user">visitor</span><span style="color:#565f89">@</span><span class="p-host">adi</span><span class="p-loc"> ~ </span><span class="prompt-arrow" style="color:#7aa2f7">❯</span> ${cmd}
-            `;
-            historyDiv.appendChild(commandBlock);
+        if (e.key === "ArrowDown") {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                inputField.value = history[historyIndex];
+            } else {
+                inputField.value = "";
+            }
+        }
+    });
 
-            let response = "";
+    document.addEventListener("click", () => inputField.focus());
 
-            switch (cmd) {
-                case 'help':
-                    response = `
-<span style="color:#7aa2f7">Available Commands:</span>
+    function process(cmd) {
+        const block = document.createElement('div');
+        block.className = "command-output";
+        block.innerHTML =
+            `<span class="p-user">visitor</span><span style="color:var(--dim)">@</span><span class="p-host">adi</span><span class="p-loc"> ~ </span><span class="prompt-arrow">❯</span> ${cmd}`;
+        historyDiv.appendChild(block);
+
+        let out = "";
+
+        switch (cmd) {
+            case "help":
+                out = `
+<span style="color:var(--accent)">Available Commands:</span>
   <span style="color:#e0af68">about</span>     ::  Information about the adi
   <span style="color:#e0af68">projects</span>  ::  List of deployed repositories
   <span style="color:#e0af68">contact</span>   ::  Communication channels
   <span style="color:#e0af68">clear</span>     ::  Clear terminal
   <span style="color:#e0af68">neofetch</span>  ::  Display system specs`;
-                    break;
-                case 'about':
-                    response = "Professional Dumbass who can code and design. 😝";
-                    break;
-                case 'projects':
-                    response = `
-1. <span style="color:#7dcfff">edy</span> - Just a .md editor type shit 😭`;
-                    break;
-                case 'contact':
-                    response = "GitHub: @imreallyadi\nEmail: adi.redflag@gmail.com\nX: @imreallyadi\nLinks: drift.rip/imreallyadi";
-                    break;
-                case 'sudo':
-                    response = "<span style='color:#f7768e'>Error: User is not in the sudoers file. This incident will be reported.</span>";
-                    break;
-                case 'neofetch':
-                    response = `
-<span style="color:#7aa2f7">       /\\ </span>      <span style="color:#7aa2f7">Adi@Portfolio</span>
-<span style="color:#7aa2f7">      /  \\</span>      -------------
-<span style="color:#7aa2f7">     /\\   \\</span>     <span style="color:#e0af68">OS</span>: Arch
-<span style="color:#7aa2f7">    /      \\</span>    <span style="color:#e0af68">Host</span>: Browser
-<span style="color:#7aa2f7">   /   ,,   \\</span>   <span style="color:#e0af68">Uptime</span>: Forever
-<span style="color:#7aa2f7">  /   |  |   \\</span>  <span style="color:#e0af68">Shell</span>: ZSH
-<span style="color:#7aa2f7"> /_-''    ''-_\\</span> <span style="color:#e0af68">Theme</span>: Tokyo Night
-`;
-                    break;
-                case 'clear':
-                    historyDiv.innerHTML = "";
-                    return;
-                default:
-                    response = `<span style="color:#f7768e">command not found: ${cmd}</span>`;
-            }
+                break;
 
-            const output = document.createElement('div');
-            output.className = 'command-output';
-            output.innerHTML = response; 
-            historyDiv.appendChild(output);
-            
-            terminalContent.scrollTop = terminalContent.scrollHeight;
+            case "about":
+                out = "Professional Dumbass who can code and design. 😝";
+                break;
+
+            case "projects":
+                out = `1. <span style="color:var(--path)">edy</span> - Just a .md editor type shit 😭`;
+                break;
+
+            case "contact":
+                out = "GitHub: @imreallyadi\nEmail: adi.redflag@gmail.com\nX: @imreallyadi\nLinks: drift.rip/imreallyadi";
+                break;
+
+            case "sudo":
+                out = `<span style='color:var(--user)'>Error: User is not in the sudoers file. This incident will be reported.</span>`;
+                break;
+
+            case "neofetch":
+                out = `
+<span style="color:var(--accent)">       /\\ </span>      <span style="color:var(--accent)">Adi@Portfolio</span>
+<span style="color:var(--accent)">      /  \\</span>      -------------
+<span style="color:var(--accent)">     /    \\</span>     <span style="color:#e0af68">OS</span>: Arch
+<span style="color:var(--accent)">    /      \\</span>    <span style="#e0af68">Host</span>: Browser
+<span style="color:var(--accent)">   /   ,,   \\</span>   <span style="#e0af68">Uptime</span>: Forever
+<span style="color:var(--accent)">  /   |  |   \\</span>  <span style="#e0af68">Shell</span>: ZSH
+<span style="color:var(--accent)"> /_-''    ''-_\\</span> <span style="#e0af68">Theme</span>: Tokyo Night`;
+                break;
+
+            case "clear":
+                historyDiv.innerHTML = "";
+                return;
+
+            default:
+                out = `<span style="color:var(--user)">command not found: ${cmd}</span>`;
         }
-    </script>
+
+        const output = document.createElement("div");
+        output.className = "command-output";
+        output.innerHTML = out;
+        historyDiv.appendChild(output);
+
+        terminalContent.scrollTop = terminalContent.scrollHeight;
+    }
+</script>
+
 </body>
 </html>
