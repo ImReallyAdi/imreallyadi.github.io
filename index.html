@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>adi@mainframe</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>SYSTEM // ADI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg: #050608;
-            --term-bg: rgba(10, 12, 16, 0.90);
-            --text: #a9b1d6;
-            --dim: #565f89;
-            --accent: #0db9d7; /* Cyber Blue */
-            --user: #f7768e;    /* Red/Pink */
-            --host: #9ece6a;    /* Matrix Green */
-            --path: #7dcfff;
-            --cursor: #9ece6a;
+            --bg-deep: #050608;
+            --glass: rgba(12, 20, 35, 0.75);
+            --border: rgba(0, 243, 255, 0.3);
+            --text-main: #b8c5e6;
+            --text-dim: #5c677d;
             
-            --font: 'JetBrains Mono', monospace;
-            --glow: 0 0 10px rgba(13, 185, 215, 0.4), 0 0 20px rgba(13, 185, 215, 0.2);
-            --crt-flicker: 0.97;
+            /* Sci-Fi Palette */
+            --cyan: #00f3ff;
+            --purple: #bc13fe;
+            --alert: #ff2a6d;
+            --success: #05ffa1;
+            
+            --font: 'Share Tech Mono', monospace;
+            --glow-cyan: 0 0 15px rgba(0, 243, 255, 0.3);
         }
 
         * {
@@ -29,420 +30,408 @@
             padding: 0;
         }
 
-        ::selection {
-            background: var(--host);
-            color: #000;
-            text-shadow: none;
-        }
-
         body {
-            background: var(--bg);
+            background: var(--bg-deep);
+            color: var(--text-main);
             font-family: var(--font);
             height: 100vh;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: var(--text);
-            overflow: hidden;
-            position: relative;
         }
 
-        /* --- Matrix Canvas --- */
-        #matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1;
-            opacity: 0.15; /* Subtle background */
-        }
-
-        /* --- CRT Overlay Effects --- */
-        .crt-overlay {
+        /* --- Starfield Canvas --- */
+        #starfield {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
+            z-index: 0;
+        }
+
+        /* --- Holographic HUD Container --- */
+        .hud-container {
+            position: relative;
             z-index: 10;
-            pointer-events: none;
-            background: 
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.9); /* Vignette */
-            animation: flicker 0.15s infinite;
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.97; }
-            50% { opacity: 0.94; }
-            100% { opacity: 0.98; }
-        }
-
-        /* --- Terminal Window --- */
-        .terminal-window {
             width: 90%;
-            max-width: 950px;
+            max-width: 1000px;
             height: 85vh;
-            background: var(--term-bg);
-            border: 1px solid rgba(13, 185, 215, 0.2);
-            border-radius: 4px; /* Sharper corners for tech look */
-            box-shadow: 
-                0 0 30px rgba(0,0,0,0.8),
-                0 0 15px rgba(13, 185, 215, 0.1); /* Subtle cyber glow */
-            backdrop-filter: blur(10px);
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--cyan);
+            backdrop-filter: blur(8px); /* Frost effect */
+            box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            position: relative;
-            z-index: 5;
+            
+            /* Corner decorations */
+            clip-path: polygon(
+                0 15px, 15px 0, 
+                100% 0, 100% calc(100% - 15px), 
+                calc(100% - 15px) 100%, 0 100%
+            );
+            
             opacity: 0;
-            animation: powerOn 0.4s ease-out forwards 0.5s;
+            animation: hudBoot 0.8s ease-out forwards 0.5s;
         }
 
-        @keyframes powerOn {
-            0% { transform: scale(1, 0.005); opacity: 0; }
-            50% { transform: scale(1, 0.005); opacity: 1; }
-            100% { transform: scale(1, 1); opacity: 1; }
+        @keyframes hudBoot {
+            0% { opacity: 0; transform: scale(0.95); filter: blur(10px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
         }
 
-        /* Header Bar */
-        .window-header {
+        /* --- Header / Top Bar --- */
+        .hud-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.8rem;
-            color: var(--dim);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .status-dot {
-            width: 8px; height: 8px;
-            background: var(--host);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--host);
-            margin-right: 8px;
-        }
-
-        .terminal-content {
-            flex-grow: 1;
-            overflow-y: auto;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            text-shadow: 0 0 2px rgba(169, 177, 214, 0.3); /* Slight text bleed */
-        }
-
-        /* Scrollbar */
-        .terminal-content::-webkit-scrollbar { width: 4px; }
-        .terminal-content::-webkit-scrollbar-thumb { background: var(--dim); }
-
-        /* --- Content Styles --- */
-        .boot-line {
-            color: var(--dim);
-            margin-bottom: 2px;
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0, 243, 255, 0.03);
             font-size: 0.85rem;
-        }
-        .boot-highlight { color: var(--accent); }
-        .boot-warn { color: var(--user); }
-
-        .hero-section {
-            margin: 40px 0;
-            border-left: 2px solid var(--accent);
-            padding-left: 20px;
-            display: none; /* Hidden until boot finishes */
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
-        .hero-name {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--text);
-            text-shadow: 2px 2px 0px var(--accent); /* Glitch shadow */
-            margin-bottom: 5px;
-            letter-spacing: -2px;
-        }
-
-        .hero-tag {
-            color: var(--host);
-            font-size: 1rem;
-            margin-bottom: 15px;
-        }
-
-        .glitch-text {
-            display: inline-block;
-        }
-
-        /* Input Area */
-        .input-line {
+        .sys-status {
             display: flex;
             align-items: center;
-            margin-top: 10px;
-            flex-wrap: wrap;
+            gap: 10px;
         }
-        
-        .p-user { color: var(--user); font-weight: bold; }
-        .p-host { color: var(--host); font-weight: bold; }
-        .p-loc { color: var(--path); font-weight: bold; }
-        .p-arrow { color: var(--accent); margin: 0 8px; font-weight: bold; }
 
-        .user-input {
+        .blink-dot {
+            width: 8px; height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse { 0%,100% { opacity: 1;} 50% { opacity: 0.3; } }
+
+        /* --- Main Content Area --- */
+        .console-body {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+            font-size: 1.05rem;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        /* Custom Scrollbar */
+        .console-body::-webkit-scrollbar { width: 6px; }
+        .console-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        .console-body::-webkit-scrollbar-thumb { background: var(--cyan); }
+
+        /* Text Styles */
+        .log-line { margin-bottom: 4px; color: var(--text-dim); }
+        .log-success { color: var(--success); }
+        .log-warn { color: var(--alert); }
+        .log-info { color: var(--cyan); }
+        
+        .hero {
+            margin: 40px 0;
+            padding: 20px;
+            border-left: 3px solid var(--purple);
+            background: linear-gradient(90deg, rgba(188, 19, 254, 0.05), transparent);
+            display: none;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 0px var(--purple);
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+
+        .cmd-output {
+            margin-bottom: 20px;
+            color: #dbeafe;
+            line-height: 1.6;
+            border-left: 1px solid var(--text-dim);
+            padding-left: 15px;
+        }
+
+        /* --- Input Area --- */
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            padding-top: 10px;
+            display: none; /* Hidden until boot */
+        }
+
+        .prompt-user { color: var(--purple); font-weight: bold; }
+        .prompt-at { color: var(--text-dim); margin: 0 5px; }
+        .prompt-host { color: var(--cyan); font-weight: bold; }
+        .prompt-char { color: var(--success); margin-left: 10px; margin-right: 10px; }
+
+        input {
             background: transparent;
             border: none;
             color: #fff;
             font-family: var(--font);
-            font-size: 1rem;
+            font-size: 1.05rem;
             flex-grow: 1;
             outline: none;
-            caret-color: transparent; /* Custom cursor used */
-            text-shadow: 0 0 5px rgba(255,255,255,0.3);
+            text-shadow: 0 0 5px rgba(255,255,255,0.4);
         }
 
-        .cursor-block {
-            display: inline-block;
-            width: 10px;
-            height: 1.1em;
-            background: var(--cursor);
-            animation: blink 1s step-end infinite;
-            vertical-align: middle;
-            margin-left: -5px; /* Pull back over real cursor */
-        }
-
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        .cmd-output {
-            margin-bottom: 15px;
-            white-space: pre-wrap;
-            color: #c0caf5;
+        /* Scanline Overlay (Subtle) */
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0.3;
         }
         
-        .cmd-key { color: var(--accent); min-width: 100px; display: inline-block; }
+        a { color: var(--cyan); text-decoration: none; border-bottom: 1px dotted var(--cyan); transition: 0.3s; }
+        a:hover { color: #fff; text-shadow: 0 0 10px var(--cyan); }
+
     </style>
 </head>
-
 <body>
 
-<canvas id="matrix-bg"></canvas>
+    <canvas id="starfield"></canvas>
 
-<div class="crt-overlay"></div>
-
-<div class="terminal-window">
-    <div class="window-header">
-        <div style="display:flex; align-items:center;">
-            <div class="status-dot"></div>
-            <span>root@adi-main: ~</span>
+    <div class="hud-container">
+        <div class="scanlines"></div>
+        
+        <div class="hud-header">
+            <div class="sys-status">
+                <div class="blink-dot"></div>
+                <span>ORBITAL LINK: STABLE</span>
+            </div>
+            <div>SECURE_SHELL_V4.2</div>
         </div>
-        <div>Encrypted Connection</div>
+
+        <div class="console-body" id="console">
+            <div id="boot-log"></div>
+            
+            <div class="hero" id="hero-block">
+                <h1>ADI_SYSTEMS</h1>
+                <div style="color:var(--cyan); letter-spacing: 1px;">// FULL STACK NAVIGATOR</div>
+                <br>
+                <div>Interface Ready. Awaiting Input.</div>
+                <div style="font-size: 0.9rem; color:var(--text-dim)">Type <span style="color:var(--success)">'help'</span> for command list.</div>
+            </div>
+
+            <div id="history"></div>
+
+            <div class="input-wrapper" id="input-line">
+                <span class="prompt-user">pilot</span>
+                <span class="prompt-at">@</span>
+                <span class="prompt-host">adi-deck</span>
+                <span class="prompt-char">➜</span>
+                <input type="text" id="cmd" autocomplete="off" spellcheck="false" autofocus>
+            </div>
+        </div>
     </div>
 
-    <div class="terminal-content" id="output">
-        <div id="boot-sequence"></div>
+    <script>
+        /* --- Starfield Warp Effect --- */
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
 
-        <div class="hero-section" id="hero">
-            <div class="hero-name" id="scramble-name">ADI</div>
-            <div class="hero-tag">> Developer | Designer | Professional Copy Paster</div>
-            <div style="color:var(--dim)">System ready. Type <span style="color:var(--host)">'help'</span> to execute commands.</div>
-        </div>
+        let width, height;
+        let stars = [];
+        const numStars = 600;
+        const speed = 4; // Warp speed
 
-        <div id="history"></div>
-
-        <div class="input-line" id="input-area" style="display:none;">
-            <span class="p-user">visitor</span>
-            <span style="color:var(--dim)">@</span>
-            <span class="p-host">adi</span>
-            <span class="p-loc"> ~ </span>
-            <span class="p-arrow">❯</span>
-            <input type="text" class="user-input" id="command-input" autocomplete="off" spellcheck="false">
-            <span class="cursor-block"></span>
-        </div>
-    </div>
-</div>
-
-<script>
-    /* --- Matrix Rain Effect --- */
-    const canvas = document.getElementById('matrix-bg');
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロヲゴゾドボポ1234567890';
-    const alphabet = katakana.split('');
-
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-
-    function drawMatrix() {
-        ctx.fillStyle = 'rgba(5, 6, 8, 0.05)'; // Fade out effect
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = '#0F0'; // Green text
-        ctx.font = fontSize + 'px monospace';
-
-        for(let i = 0; i < drops.length; i++) {
-            const text = alphabet[Math.floor(Math.random() * alphabet.length)];
-            ctx.fillStyle = (Math.random() > 0.95) ? '#fff' : '#0db9d7'; // Occasional white/blue highlight
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-            if(drops[i] * fontSize > canvas.height && Math.random() > 0.975)
-                drops[i] = 0;
-            
-            drops[i]++;
-        }
-    }
-    setInterval(drawMatrix, 33);
-    
-    window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    });
-
-    /* --- Terminal Logic --- */
-    const outputDiv = document.getElementById('output');
-    const bootDiv = document.getElementById('boot-sequence');
-    const heroDiv = document.getElementById('hero');
-    const inputArea = document.getElementById('input-area');
-    const inputField = document.getElementById('command-input');
-    const historyDiv = document.getElementById('history');
-
-    // Scramble Text Effect (Decryption)
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()";
-    function scrambleText(element, finalString) {
-        let iterations = 0;
-        const interval = setInterval(() => {
-            element.innerText = finalString.split("")
-                .map((letter, index) => {
-                    if (index < iterations) {
-                        return finalString[index];
-                    }
-                    return chars[Math.floor(Math.random() * 46)];
-                })
-                .join("");
-
-            if (iterations >= finalString.length) { 
-                clearInterval(interval);
-            }
-            iterations += 1/3; // Speed of decryption
-        }, 30);
-    }
-
-    const bootLogs = [
-        { msg: "BIOS CHECK .......................... [OK]", delay: 100 },
-        { msg: "Loading kernel modules ...", delay: 200 },
-        { msg: "Mounting /dev/sda1 to /root ...", delay: 400 },
-        { msg: "Bypassing firewall security ......... [SUCCESS]", delay: 600, class: "boot-warn" },
-        { msg: "Injecting style dependencies ...", delay: 800 },
-        { msg: "Establishing secure connection ...", delay: 1000, class: "boot-highlight" },
-        { msg: "Access Granted.", delay: 1300 }
-    ];
-
-    async function runBoot() {
-        // Initial delay for window open animation
-        await new Promise(r => setTimeout(r, 1000));
-
-        for (let log of bootLogs) {
-            const div = document.createElement('div');
-            div.className = `boot-line ${log.class || ''}`;
-            div.textContent = `> ${log.msg}`;
-            bootDiv.appendChild(div);
-            outputDiv.scrollTop = outputDiv.scrollHeight;
-            await new Promise(r => setTimeout(r, Math.random() * 200 + 50));
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
         }
 
-        await new Promise(r => setTimeout(r, 400));
-        bootDiv.style.opacity = '0.5'; // Dim boot logs
-        
-        heroDiv.style.display = 'block';
-        scrambleText(document.getElementById('scramble-name'), "ADI");
-        
-        inputArea.style.display = 'flex';
-        inputField.focus();
-    }
-
-    runBoot();
-
-    /* --- Command Handling --- */
-    const commands = {
-        help: "Lists available commands.",
-        about: "Who is Adi?",
-        projects: "View my work.",
-        socials: "Connect with me.",
-        clear: "Clean the terminal.",
-        hack: "Don't try this."
-    };
-
-    inputField.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            const cmd = this.value.trim().toLowerCase();
-            this.value = '';
-            
-            // Add prompt line to history
-            const promptHTML = `<div style="margin-top:5px"><span class="p-user">visitor</span><span style="color:#565f89">@</span><span class="p-host">adi</span><span class="p-loc"> ~ </span><span class="p-arrow">❯</span> ${cmd}</div>`;
-            
-            let response = "";
-
-            switch(cmd) {
-                case 'help':
-                    response = Object.keys(commands).map(key => 
-                        `<div><span class="cmd-key">${key}</span> ${commands[key]}</div>`
-                    ).join('');
-                    break;
-                case 'about':
-                    response = "Professional Dumbass who can code and design. 😝<br>Specializing in web development, bad jokes, and darker themes.";
-                    break;
-                case 'projects':
-                    response = `
-                        <div><span style="color:var(--path)">1. edy</span> - A markdown editor that probably has bugs.</div>
-                        <div><span style="color:var(--path)">2. portfolio</span> - You are looking at it.</div>
-                        <div><span style="color:var(--path)">3. secret</span> - 403 Forbidden.</div>
-                    `;
-                    break;
-                case 'socials':
-                    response = `
-                        <div>GitHub: <a href="#" style="color:var(--text)">@imreallyadi</a></div>
-                        <div>X/Twitter: <a href="#" style="color:var(--text)">@imreallyadi</a></div>
-                    `;
-                    break;
-                case 'hack':
-                    response = "<span style='color:var(--user)'>WARNING: ILLEGAL OPERATION DETECTED. TRACING IP...</span>";
-                    break;
-                case 'clear':
-                    historyDiv.innerHTML = '';
-                    bootDiv.style.display = 'none';
-                    return; // Exit without printing response
-                case '':
-                    response = ""; // Do nothing on empty enter
-                    break;
-                default:
-                    response = `<span style="color:var(--user)">Command not found: ${cmd}</span>. Type 'help'.`;
+        class Star {
+            constructor() {
+                this.reset(true);
             }
 
-            if(response) {
-                const respDiv = document.createElement('div');
-                respDiv.className = 'cmd-output';
-                respDiv.innerHTML = response;
-                // wrapper
-                const wrap = document.createElement('div');
-                wrap.innerHTML = promptHTML;
-                wrap.appendChild(respDiv);
-                historyDiv.appendChild(wrap);
-            } else if (cmd !== 'clear') {
-                historyDiv.innerHTML += promptHTML;
+            reset(initial = false) {
+                this.x = (Math.random() - 0.5) * width * 2; // Spread wider
+                this.y = (Math.random() - 0.5) * height * 2;
+                this.z = initial ? Math.random() * width : width;
+                this.size = Math.random() * 2;
+                this.color = Math.random() > 0.8 ? '#00f3ff' : '#ffffff'; // Cyan or white stars
             }
 
-            outputDiv.scrollTop = outputDiv.scrollHeight;
+            update() {
+                this.z -= speed;
+                if (this.z <= 0) this.reset();
+            }
+
+            draw() {
+                // Perspective projection
+                const sx = (this.x / this.z) * width + width / 2;
+                const sy = (this.y / this.z) * height + height / 2;
+                
+                // Size grows as it gets closer
+                const r = (1 - this.z / width) * 4 * this.size; 
+
+                // Don't draw if out of bounds
+                if (sx < 0 || sx > width || sy < 0 || sy > height) return;
+
+                ctx.beginPath();
+                ctx.fillStyle = this.color;
+                ctx.arc(sx, sy, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
-    });
 
-    // Keep focus
-    document.addEventListener('click', () => {
-        const sel = window.getSelection();
-        if(sel.toString() === '') inputField.focus();
-    });
+        function initStars() {
+            resize();
+            stars = [];
+            for (let i = 0; i < numStars; i++) {
+                stars.push(new Star());
+            }
+            animate();
+        }
 
-</script>
+        function animate() {
+            // Trail effect (lower opacity = longer trails)
+            ctx.fillStyle = 'rgba(5, 6, 8, 0.4)'; 
+            ctx.fillRect(0, 0, width, height);
+
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        initStars();
+
+
+        /* --- Terminal Logic --- */
+        const bootLog = document.getElementById('boot-log');
+        const hero = document.getElementById('hero-block');
+        const inputLine = document.getElementById('input-line');
+        const cmdInput = document.getElementById('cmd');
+        const history = document.getElementById('history');
+        const consoleBody = document.getElementById('console');
+
+        const logs = [
+            { text: "Initializing Core Systems...", delay: 200 },
+            { text: "Loading Neural Interfaces...", delay: 400 },
+            { text: "Connecting to Satellite Relay [404-X]...", delay: 700 },
+            { text: "Encryption Key Verified.", delay: 1000, class: "log-success" },
+            { text: "Warp Drive: STANDBY", delay: 1200, class: "log-info" },
+            { text: "Bio-Metrics: MATCH FOUND (User: ADI)", delay: 1500, class: "log-success" }
+        ];
+
+        async function startBoot() {
+            await new Promise(r => setTimeout(r, 800)); // Wait for HUD animation
+
+            for (let log of logs) {
+                const p = document.createElement('div');
+                p.className = `log-line ${log.class || ''}`;
+                p.innerText = `> ${log.text}`;
+                bootLog.appendChild(p);
+                await new Promise(r => setTimeout(r, Math.random() * 300 + 100));
+            }
+
+            await new Promise(r => setTimeout(r, 500));
+            bootLog.style.opacity = '0.4'; // Dim logs
+            hero.style.display = 'block';
+            inputLine.style.display = 'flex';
+            cmdInput.focus();
+            consoleBody.scrollTop = consoleBody.scrollHeight;
+        }
+
+        startBoot();
+
+        // Command Processor
+        const commands = {
+            help: "Displays available protocols.",
+            about: "Identity and mission status.",
+            skills: "Technological arsenal.",
+            projects: "Deployed entities.",
+            contact: "Establish comms link.",
+            clear: "Purge visual data."
+        };
+
+        cmdInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = cmdInput.value.trim().toLowerCase();
+                cmdInput.value = '';
+
+                // Add prompt history
+                const promptRow = document.createElement('div');
+                promptRow.innerHTML = `<span class="prompt-user">pilot</span><span class="prompt-at">@</span><span class="prompt-host">adi-deck</span><span class="prompt-char">➜</span> ${val}`;
+                promptRow.style.marginTop = '10px';
+                history.appendChild(promptRow);
+
+                let response = '';
+
+                switch(val) {
+                    case 'help':
+                        response = Object.keys(commands).map(k => 
+                            `<div><span style="color:var(--success); width:100px; display:inline-block;">${k}</span> ${commands[k]}</div>`
+                        ).join('');
+                        break;
+                    
+                    case 'about':
+                        response = `Status: ONLINE.<br>Full-Stack Developer based in the Milky Way.<br>Specializing in clean code, dark coffee, and space-age interfaces.`;
+                        break;
+
+                    case 'skills':
+                        response = `
+                        <span style="color:var(--purple)">[FRONTEND]</span> React, Three.js, CSS3<br>
+                        <span style="color:var(--cyan)">[BACKEND]</span> Node, Python, SQL<br>
+                        <span style="color:var(--alert)">[WEAPONS]</span> VIM, Git, Figma
+                        `;
+                        break;
+
+                    case 'projects':
+                        response = `
+                        1. <a href="#">Project_Alpha</a> // Stealth tech<br>
+                        2. <a href="#">Neon_Engine</a> // Render core<br>
+                        3. <a href="#">Void_Walker</a> // AI navigation
+                        `;
+                        break;
+
+                    case 'contact':
+                        response = `
+                        Signal detected.<br>
+                        > <a href="#">Email Transmission</a><br>
+                        > <a href="#">GitHub Uplink</a>
+                        `;
+                        break;
+
+                    case 'clear':
+                        history.innerHTML = '';
+                        bootLog.style.display = 'none';
+                        hero.style.display = 'none';
+                        break;
+
+                    case '':
+                        break;
+
+                    default:
+                        response = `<span style="color:var(--alert)">ERROR: Unknown Protocol '${val}'</span>. Try 'help'.`;
+                }
+
+                if (response) {
+                    const respDiv = document.createElement('div');
+                    respDiv.className = 'cmd-output';
+                    respDiv.innerHTML = response;
+                    history.appendChild(respDiv);
+                }
+
+                consoleBody.scrollTop = consoleBody.scrollHeight;
+            }
+        });
+
+        // Always focus input
+        document.addEventListener('click', () => cmdInput.focus());
+
+    </script>
 </body>
 </html>
