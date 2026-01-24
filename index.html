@@ -1,463 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADI // STAR-DECK</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>adi.zip</title>
 
-    <style>
-        :root {
-            --bg-deep: #020204;
-            --glass: rgba(10, 15, 30, 0.65);
-            --border: rgba(56, 189, 248, 0.3);
-            
-            /* Sci-Fi Palette */
-            --cyan: #38bdf8;
-            --purple: #c084fc;
-            --pink: #f472b6;
-            --alert: #ef4444;
-            --success: #4ade80;
-            
-            --font: 'Share Tech Mono', monospace;
-            --glow-text: 0 0 5px rgba(56, 189, 248, 0.5);
-        }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #0b0b0f;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
 
-        body {
-            background: var(--bg-deep);
-            color: #e2e8f0;
-            font-family: var(--font);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px; /* For 3D tilt */
-        }
+    .canva-wrapper {
+      position: fixed;
+      inset: 0;
+    }
 
-        /* --- Deep Space Nebula --- */
-        .nebula-bg {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(76, 29, 149, 0.2) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(14, 165, 233, 0.15) 0%, transparent 40%);
-            z-index: 0;
-            animation: pulseNebula 10s ease-in-out infinite alternate;
-        }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
 
-        @keyframes pulseNebula {
-            0% { opacity: 0.5; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.1); }
-        }
+    .credit {
+      position: fixed;
+      bottom: 12px;
+      right: 16px;
+      font-size: 12px;
+      opacity: 0.6;
+      color: #fff;
+    }
 
-        /* --- Starfield Canvas --- */
-        #starfield {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 1;
-        }
+    .credit a {
+      color: #fff;
+      text-decoration: none;
+    }
 
-        /* --- Holographic HUD Container --- */
-        .hud-container {
-            position: relative;
-            z-index: 10;
-            width: 90%;
-            max-width: 950px;
-            height: 85vh;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            
-            /* Tech Corners */
-            box-shadow: 
-                0 0 40px rgba(14, 165, 233, 0.15),
-                inset 0 0 20px rgba(0,0,0,0.5);
-            backdrop-filter: blur(12px);
-            
-            display: flex;
-            flex-direction: column;
-            transform-style: preserve-3d;
-            transform: rotateX(2deg); /* Slight 3D tilt */
-            transition: transform 0.2s;
-            
-            opacity: 0;
-            animation: hudBoot 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.5s;
-        }
-
-        @keyframes hudBoot {
-            0% { opacity: 0; transform: scale(0.9) rotateX(10deg); }
-            100% { opacity: 1; transform: scale(1) rotateX(2deg); }
-        }
-
-        /* --- Top Bar --- */
-        .hud-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            background: rgba(0, 0, 0, 0.2);
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--cyan);
-        }
-
-        .dot {
-            width: 6px; height: 6px;
-            background: var(--cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--cyan);
-            animation: blink 2s infinite;
-        }
-        
-        @keyframes blink { 0%,100% {opacity:1;} 50%{opacity:0.3;} }
-
-        /* --- Terminal Body --- */
-        .console-body {
-            flex-grow: 1;
-            padding: 25px;
-            overflow-y: auto;
-            font-size: 1.05rem;
-            text-shadow: 0 0 2px rgba(0,0,0,0.8);
-        }
-
-        /* Custom Scrollbar */
-        .console-body::-webkit-scrollbar { width: 6px; }
-        .console-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        .console-body::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-
-        /* --- Content Styling --- */
-        .log-line { margin-bottom: 4px; color: #94a3b8; font-size: 0.9rem; }
-        .log-highlight { color: var(--cyan); }
-        .log-warn { color: var(--alert); }
-
-        .hero {
-            margin: 40px 0;
-            padding-left: 20px;
-            border-left: 2px solid var(--purple);
-            display: none;
-        }
-
-        .hero-title {
-            font-size: 3rem;
-            color: #fff;
-            text-shadow: 0 0 15px var(--purple);
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-        }
-
-        .glitch-sub {
-            color: var(--pink);
-            font-size: 1rem;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .cmd-output {
-            margin-bottom: 20px;
-            color: #cbd5e1;
-            line-height: 1.6;
-            white-space: pre-wrap; /* Preserve line breaks */
-        }
-
-        /* Links */
-        a { color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan); transition: 0.2s; }
-        a:hover { color: #fff; border-bottom-style: solid; text-shadow: 0 0 10px var(--cyan); }
-
-        /* --- Input Area --- */
-        .input-wrapper {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-            display: none; /* Hidden until boot */
-            flex-wrap: wrap;
-        }
-
-        .p-user { color: var(--pink); font-weight: bold; }
-        .p-at { color: #64748b; margin: 0 4px; }
-        .p-host { color: var(--cyan); font-weight: bold; }
-        .p-arrow { color: var(--success); margin: 0 10px; }
-
-        input {
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-family: var(--font);
-            font-size: 1.05rem;
-            flex-grow: 1;
-            outline: none;
-            min-width: 50%;
-        }
-
-        /* Scanline Overlay */
-        .scanlines {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-            z-index: 20;
-            opacity: 0.4;
-            border-radius: 8px;
-        }
-
-    </style>
+    .credit a:hover {
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="nebula-bg"></div>
-    <canvas id="starfield"></canvas>
+  <div class="canva-wrapper">
+    <iframe
+      loading="lazy"
+      src="https://www.canva.com/design/DAG_OH_rmow/APT2dio1Y1K1rOpgq0WIZA/view?embed"
+      allowfullscreen
+      allow="fullscreen">
+    </iframe>
+  </div>
 
-    <div class="hud-container">
-        <div class="scanlines"></div>
-        
-        <div class="hud-header">
-            <div class="status-badge">
-                <div class="dot"></div>
-                <span>UPLINK ESTABLISHED</span>
-            </div>
-            <div style="opacity: 0.7;">ENCRYPTED // SHA-256</div>
-        </div>
+  <div class="credit">
+    <a href="https://www.canva.com/design/DAG_OH_rmow/APT2dio1Y1K1rOpgq0WIZA/view" target="_blank" rel="noopener">
+      adi.zip
+    </a> · by adi
+  </div>
 
-        <div class="console-body" id="console">
-            <div id="boot-log"></div>
-            
-            <div class="hero" id="hero-block">
-                <div class="hero-title">ADI</div>
-                <div class="glitch-sub">>> Developer | Designer | Professional Copy Paster</div>
-                <div>System status: <span style="color:var(--success)">OPERATIONAL</span>.</div>
-                <div style="font-size: 0.9rem; color:#94a3b8; margin-top:5px;">Type <span style="color:var(--cyan)">'help'</span> to execute protocols.</div>
-            </div>
-
-            <div id="history"></div>
-
-            <div class="input-wrapper" id="input-line">
-                <span class="p-user">visitor</span>
-                <span class="p-at">@</span>
-                <span class="p-host">adi-starship</span>
-                <span class="p-arrow">➜</span>
-                <input type="text" id="cmd" autocomplete="off" spellcheck="false" autofocus>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        /* --- Starfield Warp Effect --- */
-        const canvas = document.getElementById('starfield');
-        const ctx = canvas.getContext('2d');
-
-        let width, height;
-        let stars = [];
-        const numStars = 400;
-        const speed = 2; // Cruising speed
-
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-        }
-
-        class Star {
-            constructor() {
-                this.reset(true);
-            }
-            reset(initial = false) {
-                this.x = (Math.random() - 0.5) * width * 2;
-                this.y = (Math.random() - 0.5) * height * 2;
-                this.z = initial ? Math.random() * width : width;
-                this.size = Math.random() * 1.5;
-                this.fill = Math.random() > 0.9 ? '#38bdf8' : '#ffffff';
-            }
-            update() {
-                this.z -= speed;
-                if (this.z <= 0) this.reset();
-            }
-            draw() {
-                const sx = (this.x / this.z) * width + width / 2;
-                const sy = (this.y / this.z) * height + height / 2;
-                const r = (1 - this.z / width) * 3 * this.size;
-                if (sx < 0 || sx > width || sy < 0 || sy > height) return;
-                
-                ctx.beginPath();
-                ctx.fillStyle = this.fill;
-                ctx.arc(sx, sy, r, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function initStars() {
-            resize();
-            stars = [];
-            for (let i = 0; i < numStars; i++) stars.push(new Star());
-            animate();
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height); // Clear cleanly for deep space look
-            stars.forEach(star => { star.update(); star.draw(); });
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('resize', resize);
-        initStars();
-
-
-        /* --- Terminal Logic --- */
-        const bootLog = document.getElementById('boot-log');
-        const hero = document.getElementById('hero-block');
-        const inputLine = document.getElementById('input-line');
-        const cmdInput = document.getElementById('cmd');
-        const history = document.getElementById('history');
-        const consoleBody = document.getElementById('console');
-
-        // Typing Effect Function
-        function typeWriter(element, text, speed = 20) {
-            let i = 0;
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                    consoleBody.scrollTop = consoleBody.scrollHeight;
-                }
-            }
-            type();
-        }
-
-        const logs = [
-            { text: "BIOS CHECK .......................... [OK]", delay: 100 },
-            { text: "Loading kernel modules ...", delay: 200 },
-            { text: "Mounting /dev/space1 to /root ...", delay: 400 },
-            { text: "Bypassing firewall security ......... [SUCCESS]", delay: 600, class: "log-warn" },
-            { text: "Injecting style dependencies ...", delay: 800 },
-            { text: "Establishing secure connection ...", delay: 1000, class: "log-highlight" },
-            { text: "Access Granted.", delay: 1300 }
-        ];
-
-        async function startBoot() {
-            await new Promise(r => setTimeout(r, 1000));
-            
-            for (let log of logs) {
-                const p = document.createElement('div');
-                p.className = `log-line ${log.class || ''}`;
-                p.innerText = `> ${log.text}`;
-                bootLog.appendChild(p);
-                consoleBody.scrollTop = consoleBody.scrollHeight;
-                await new Promise(r => setTimeout(r, Math.random() * 200 + 50));
-            }
-
-            await new Promise(r => setTimeout(r, 400));
-            bootLog.style.opacity = '0.5';
-            hero.style.display = 'block';
-            inputLine.style.display = 'flex';
-            cmdInput.focus();
-        }
-
-        startBoot();
-
-        /* --- Command Handling --- */
-        const commands = {
-            help: "Lists available commands.",
-            about: "Who is Adi?",
-            projects: "View my work.",
-            socials: "Connect with me.",
-            clear: "Clean the terminal.",
-            hack: "Don't try this."
-        };
-
-        cmdInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const cmd = cmdInput.value.trim().toLowerCase();
-                cmdInput.value = '';
-
-                // Add user prompt to history
-                const promptHTML = `<div style="margin-top:10px; margin-bottom: 5px;">
-                    <span class="p-user">visitor</span><span class="p-at">@</span><span class="p-host">adi-starship</span><span class="p-arrow">➜</span> ${cmd}
-                </div>`;
-                
-                let response = "";
-
-                switch(cmd) {
-                    case 'help':
-                        response = Object.keys(commands).map(key => 
-                            `<div><span style="color:var(--cyan); min-width:100px; display:inline-block;">${key}</span> ${commands[key]}</div>`
-                        ).join('');
-                        break;
-                    
-                    case 'about':
-                        response = `Professional Dumbass who can code and design. 😝<br>Specializing in web development, bad jokes, and darker themes.`;
-                        break;
-                    
-                    case 'projects':
-                        response = `
-                        <div><span style="color:var(--purple)">1. edy</span> - A markdown editor that probably has bugs.</div>
-                        <div><span style="color:var(--purple)">2. portfolio</span> - You are looking at it.</div>
-                        <div><span style="color:var(--purple)">3. secret</span> - 403 Forbidden.</div>
-                        `;
-                        break;
-                    
-                    case 'socials':
-                        response = `
-                        <div>GitHub: <a href="https://github.com/imreallyadi" target="_blank">@imreallyadi</a></div>
-                        <div>X/Twitter: <a href="https://x.com/imreallyadi" target="_blank">@imreallyadi</a></div>
-                        `;
-                        break;
-                    
-                    case 'hack':
-                        response = `<span style="color:var(--alert)">WARNING: ILLEGAL OPERATION DETECTED. TRACING IP...</span>`;
-                        break;
-                    
-                    case 'clear':
-                        history.innerHTML = '';
-                        bootLog.style.display = 'none';
-                        // Keep hero hidden after clear? Or show it? Let's hide boot, keep input.
-                        return;
-
-                    case '':
-                        return;
-
-                    default:
-                        response = `<span style="color:var(--alert)">Command not found: ${cmd}</span>. Type 'help'.`;
-                }
-
-                history.innerHTML += promptHTML;
-                
-                if (response) {
-                    const respDiv = document.createElement('div');
-                    respDiv.className = 'cmd-output';
-                    history.appendChild(respDiv);
-                    // Use typewriter effect for response
-                    typeWriter(respDiv, response.replace(/<[^>]*>?/gm, (match) => match), 10); 
-                    // Note: Simple typewriter breaks HTML tags. 
-                    // We will just set innerHTML directly for complex HTML responses to avoid breaking links.
-                    respDiv.innerHTML = response; 
-                }
-
-                consoleBody.scrollTop = consoleBody.scrollHeight;
-            }
-        });
-
-        document.addEventListener('click', () => cmdInput.focus());
-
-    </script>
 </body>
 </html>
