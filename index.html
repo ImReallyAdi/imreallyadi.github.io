@@ -2,91 +2,105 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  
   <title>adi.zip</title>
+  <meta name="title" content="adi,zip">.">
+  <meta name="keywords" content="adi.zip, imreallyadi">
+  <meta name="author" content="imreallyadi">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://imreallyadi.space">
+  <meta property="og:title" content="imreallyadi • adi.zip">
+  <meta property="og:description" content="proffessional dumbass">
+  <meta property="og:image" content="https://files.catbox.moe/lq3tqf.jpeg">
+
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="adi.zip">
+  <meta property="twitter:description" content="proffesional dumbasss">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-snap-type: y mandatory; scroll-behavior: smooth; background: #000; }
+    body { width: 100%; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      background: #000;
+    section {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      scroll-snap-align: start;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .video-stage {
-      position: fixed;
-      inset: 0;
-    }
-
-    .video-layer {
+    video {
       position: absolute;
-      inset: 0;
-      opacity: 0;
-      transition: opacity 1.2s ease;
-    }
-
-    .video-layer.active {
-      opacity: 1;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      will-change: transform;
       z-index: 1;
     }
 
-    .video-layer video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    /* SEO: Visually hidden but readable by Google */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
     }
 
-    /* clickable overlay */
-    .video-layer a {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-    }
+    .video-container { opacity: 0; transition: opacity 1s ease; }
+    .video-container.loaded { opacity: 1; }
   </style>
 </head>
-
 <body>
 
-  <div class="video-stage">
+  <h1 class="sr-only">adi.zip</h1>
 
-    <!-- Home (not clickable) -->
-    <div class="video-layer active">
+  <main>
+    <section class="video-container" aria-label="Home Video">
+      <h2 class="sr-only">Welcome to Adi's World</h2>
       <video src="Home.mp4" autoplay muted loop playsinline></video>
-    </div>
+    </section>
 
-    <!-- Links -->
-    <div class="video-layer">
+    <section class="video-container" aria-label="Links and Socials">
+      <h2 class="sr-only">Connect with Me</h2>
       <video src="links.mp4" autoplay muted loop playsinline></video>
-      <a href="https://drift.rip/imreallyadi" target="_blank" rel="noopener"></a>
-    </div>
+    </section>
 
-    <!-- Projects -->
-    <div class="video-layer">
+    <section class="video-container" aria-label="Recent Projects">
+      <h2 class="sr-only">My Featured Projects</h2>
       <video src="project.mp4" autoplay muted loop playsinline></video>
-      <a href="https://projects.imreallyadi.space" target="_blank" rel="noopener"></a>
-    </div>
-
-  </div>
+    </section>
+  </main>
 
   <script>
-    const layers = document.querySelectorAll('.video-layer');
-    let index = 0;
+    const sections = document.querySelectorAll('.video-container');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const video = entry.target.querySelector('video');
+        if (entry.isIntersecting) {
+          entry.target.classList.add('loaded');
+          video.play();
+        } else {
+          video.pause();
+        }
+      });
+    }, { threshold: 0.5 });
 
-    setInterval(() => {
-      layers[index].classList.remove('active');
-      index = (index + 1) % layers.length;
-      layers[index].classList.add('active');
-    }, 5000);
+    sections.forEach(section => observer.observe(section));
   </script>
 
 </body>
