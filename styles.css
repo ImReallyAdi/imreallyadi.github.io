@@ -1,0 +1,74 @@
+@font-face {
+  font-family: "Mila Line";
+  src: url("assets/fonts/mila-line.woff2") format("woff2");
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: "Bernoru Expanded";
+  src: url("assets/fonts/bernoru-expanded.woff2") format("woff2");
+}
+
+:root {
+  --bg: #f4f1e8;
+  --text: #2b262b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  gap: 8rem;
+  padding: 4rem;
+}
+
+.hero {
+  display: grid;
+  place-items: center;
+}
+
+.logo {
+  font-family: "Mila Line";
+  font-size: clamp(4rem, 18vw, 16rem);
+  font-weight: 300;
+  letter-spacing: -0.07em;
+  text-align: center;
+}
+
+.links,
+.projects {
+  text-align: center;
+  font-family: "Bernoru Expanded";
+}
+
+.primary {
+  font-size: 4rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.secondary {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  text-decoration: underline;
+}
+
+.projects h2 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.projects a {
+  font-size: 1.8rem;
+  text-decoration: none;
+  color: var(--text);
+}
