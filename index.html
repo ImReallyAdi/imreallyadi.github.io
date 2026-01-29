@@ -2,112 +2,69 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+
   <title>adi.zip</title>
-  <meta name="description" content="proffesional dumbass" />
-  <meta name="keywords" content="adi.zip, imreallyadi" />
-  <meta name="author" content="adi.zip" />
-  <link rel="canonical" href="https://imreallyadi.space" />
 
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://adi.zip/" />
-  <meta property="og:title" content="adi.zip — Proffesional dumbass" />
-  <meta property="og:description" content="Official site of imreallyadi. View selected works and links." />
-  <meta property="og:image" content="assets/og-image.jpg" /> <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="adi.zip" />
-  <meta name="twitter:description" content="Official site of imreallyadi." />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <link rel="icon" href="assets/favicon.png" />
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="styles.css" />
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "adi.zip",
-    "alternateName": "imreallyadi",
-    "url": "https://imrrallyadi.space",
-    "sameAs": [
-      "https://drift.rip/imreallyadi",
-      "https://twitter.com/imreallyadi"
-    ],
-    "jobTitle": "proffessional dumbass"
-  }
-  </script>
+    .video-stage {
+      position: fixed;
+      inset: 0;
+    }
+
+    .video-stage video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+
+    .video-stage video.active {
+      opacity: 1;
+      z-index: 1;
+    }
+  </style>
 </head>
+
 <body>
-  
-  <div class="noise"></div>
 
-  <header class="marquee-container">
-    <div class="marquee-content">
-      <span>ADI.ZIP  —  IMREALLYADI  —  </span>
-      <span>ADI.ZIP  —  IMREALLYADI  —  </span>
-    </div>
-  </header>
+  <div class="video-stage">
+    <video src="Home.mp4" autoplay muted loop playsinline></video>
+    <video src="links.mp4" autoplay muted loop playsinline></video>
+    <video src="project.mp4" autoplay muted loop playsinline></video>
+  </div>
 
-  <main class="grid-container">
-    
-    <section class="hero-block box-border">
-      <div class="hero-inner">
-        <span class="label">Identity</span>
-        <h1 class="glitch-text" data-text="adi.zip">adi.zip</h1>
-        <p class="hero-sub">Digital Craftsman &<br>Interface Designer</p>
-      </div>
-      <div class="hero-status box-border">
-        <span class="blink">●</span> Online
-        <span id="clock" class="clock">00:00:00</span>
-      </div>
-    </section>
+  <script>
+    const videos = document.querySelectorAll('.video-stage video');
+    let index = 0;
 
-    <section class="content-block box-border">
-      <div class="block-header">
-        <h2>Connect</h2>
-      </div>
-      <div class="link-wrapper">
-        <a href="https://drift.rip/imreallyadi" target="_blank" rel="noopener" class="brutal-btn">
-          <span class="btn-text">Drift.rip</span>
-          <span class="btn-icon">↗</span>
-          <div class="btn-bg"></div>
-        </a>
-        <p class="micro-text">Centralized Hub</p>
-      </div>
-    </section>
+    videos[index].classList.add('active');
 
-    <section class="content-block box-border">
-      <div class="block-header">
-        <h2>Selected Work</h2>
-      </div>
-      <ul class="project-list">
-        <li class="project-item">
-          <a href="https://adidotzip.vercel.app" target="_blank" rel="noopener" class="project-link">
-            <span class="project-name">adidotzip.vercel.app</span>
-            <span class="project-arrow">→</span>
-          </a>
-        </li>
-        <li class="project-item">
-          <span class="project-name disabled">wobbling around lad.</span>
-        </li>
-      </ul>
-    </section>
+    setInterval(() => {
+      videos[index].classList.remove('active');
+      index = (index + 1) % videos.length;
+      videos[index].classList.add('active');
+    }, 5000); // change every 5s
+  </script>
 
-  </main>
-
-  <footer class="footer box-border">
-    <div class="footer-col">
-      <span>© 2026 adi.zip</span>
-    </div>
-    <div class="footer-col right">
-      <span>EST. DELHI, INDIA</span>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
 </body>
 </html>
